@@ -15,9 +15,18 @@ const buildControls=props=>{
 
     return (
         <div className={classes.BuildControls}>
+            <p>Total price: <strong>{props.totalPrice.toFixed(2)}</strong></p>
             {bCs.map(cntrl=>{
-                return <BuildControl key={cntrl.label} label={cntrl.label} added={()=>props.addIngredients(cntrl.type)} />
+                return <BuildControl 
+                            key={cntrl.label} label={cntrl.label} 
+                            added={()=>props.addIngredients(cntrl.type)} 
+                            removed={()=>{props.removeIngredients(cntrl.type)}}
+                            disabled={props.disabled[cntrl.type]}/>
             })}
+            <button 
+                className={classes.OrderButton}
+                disabled={ !props.purchasable}
+                onClick={props.purchaseHandler}>ORDER NOW</button>
         </div>
     );
 }
