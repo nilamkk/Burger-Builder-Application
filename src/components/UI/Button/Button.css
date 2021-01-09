@@ -22,3 +22,8 @@
 .Danger {
     color: #944317;
 }
+
+.Disabled{
+    color:rgb(145, 141, 141);
+    cursor: not-allowed;
+}

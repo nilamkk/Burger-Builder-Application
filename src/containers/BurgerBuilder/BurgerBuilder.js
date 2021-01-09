@@ -97,31 +97,21 @@ class BurgerBuilder extends Component{
     cancelPurchaseHandler=()=>{
         this.setState({purchasing:false})   
     }
-     finalPurchase=async ()=>{
-        this.setState({loading:true})
-        const orders={
-            ingredients:this.state.ingredients,
-            price:this.state.totalPrice,
-            customer:{
-                name:'NKK',
-                address:{
-                    street:'Poly Road',
-                    country:'India'
-                },
-                email:'nkk@gmail.com'
-            },
-            deliveryMethod:'fast'
-        }
+    finalPurchase= ()=>{
 
-        try{
-            this.setState({loading:false,purchasing:false})
-            const response=await axios.post('/orders.json',orders)                // json required for only FIREBASE
-            console.log(response)
-
-        }catch(e){
-            this.setState({loading:false,purchasing:false})
-            console.log(e)
+        const queryParams=[]
+        for(let i in this.state.ingredients){
+            queryParams.push(encodeURIComponent(i)+"="+encodeURIComponent(this.state.ingredients[i]))
         }
+        queryParams.push("price="+encodeURIComponent(this.state.totalPrice))
+
+        const queryString=queryParams.join('&')
+
+        this.props.history.push({
+            pathname:"/checkout",
+            search:`?${queryString}`
+        })
+        
     }
 
 
@@ -143,12 +133,12 @@ class BurgerBuilder extends Component{
                 <Aux>
                     <Burger ingredients={this.state.ingredients}/>
                     <BuildControls 
-                    addIngredients={this.addIngredientHandler}
-                    removeIngredients={this.removeIngredientHandler} 
-                    disabled={disabledInfo}
-                    totalPrice={this.state.totalPrice}
-                    purchasable={this.state.purchasable}
-                    purchaseHandler={this.purchaseHandler}/>
+                        addIngredients={this.addIngredientHandler}
+                        removeIngredients={this.removeIngredientHandler} 
+                        disabled={disabledInfo}
+                        totalPrice={this.state.totalPrice}
+                        purchasable={this.state.purchasable}
+                        purchaseHandler={this.purchaseHandler}/>
                 </Aux>
             )
             orderSummary=(
@@ -156,7 +146,7 @@ class BurgerBuilder extends Component{
                     ingredients={this.state.ingredients}
                     totalPrice={this.state.totalPrice}
                     cancelOrder={this.cancelPurchaseHandler}
-                    finalOrder={this.finalPurchase}/>
+                    finalOrder={this.finalPurchase}/>               
             )
         }
 
