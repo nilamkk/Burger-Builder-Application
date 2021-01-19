@@ -1,49 +1,27 @@
 import React,{Component} from 'react'
-
+import {connect} from 'react-redux'
 import Order from '../../components/Order/Order'
 import axios from '../../axios-orders'
 import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler'
+import * as actions from '../../store/actions/index'
 
 class Orders extends Component{
-
-    state={
-        orders:[],
-        loading:true
+    componentDidMount(){
+        this.props.onFetchOrders(this.props.token,this.props.userId)
     }
-
-    async componentDidMount(){
-        try{
-            const response=await axios.get('/orders.json')
-            // console.log(response)
-            const fetchData=[]
-
-            for(let key in response.data ){
-                fetchData.push({
-                    ...response.data[key],
-                    id:key
-                })
-            }
-            this.setState({
-                orders:fetchData,
-                loading:false
-            })
-
-        }catch(e){
-            this.setState({loading:false})
-            console.log(e)
-        }        
-    }
-
+    
     render(){
-        let orders=<p style={{'text-align':'center'}} >LOADING...</p>
-
-        if(!this.state.loading){
-            orders=this.state.orders.map((order)=>{
+        let orders=<p style={{textAlign:'center'}} >LOADING...</p>
+        if(!this.props.loading){
+            orders=this.props.orders.map((order,index)=>{
                 return <Order 
-                            key={order.id}
+                            key={order.id+index}
                             ingredients={order.ingredients}
                             price={order.price}/>
             })
+            if(this.props.orders.length===0){
+                orders=<p style={{color:'#999',textAlign:'center',marginTop:'40%'}}> No order found </p>
+            }
         }
         return(
             <div>
@@ -53,5 +31,20 @@ class Orders extends Component{
     }
 }
 
+const mapStateToProps=state=>{
+    return{
+        orders:state.order.orders,
+        loading:state.order.loading,
+        token:state.auth.token,
+        userId:state.auth.userId
+    }
+}
 
-export default withErrorHandler(Orders,axios) ;
+const mapDispatchToProps=dispatch=>{
+    return{
+        onFetchOrders:(token,userId)=>dispatch(actions.fetchOrder(token,userId))
+    }
+}
+
+
+export default connect(mapStateToProps,mapDispatchToProps)(withErrorHandler(Orders,axios)) ;

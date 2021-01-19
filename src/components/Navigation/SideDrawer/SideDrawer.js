@@ -18,13 +18,13 @@ const sideDrawer=(props)=>{
             <Backdrop 
                 show={props.open}
                 clicked={props.closed}/>
-            <div className={attatchedClasses.join(' ')}>
+            <div className={attatchedClasses.join(' ')} onClick={props.closed}>
                 <div className={classes.Logo}>
                     <Logo/>
                 </div>
                 
                 <nav>
-                    <NavigationItems/>
+                    <NavigationItems isAuthenticated={props.isAuthenticated}/>
                 </nav>
             </div>
 

@@ -12,7 +12,6 @@ const orderSummary=props=>{
                                         <span style={{textTransform:'capitalize'}}>{ele}</span>: {props.ingredients[ele]}
                                     </li>
                             }) 
-
     return(
         <Aux>
             <h3>Your Order</h3>

@@ -1,10 +1,14 @@
 import React,{Component} from 'react'
+import {connect} from 'react-redux'
 
 import Button from '../../../components/UI/Button/Button'
 import classes from './ContactData.css'
 import axios from '../../../axios-orders'
 import Spinner from '../../../components/UI/Spinner/Spinner'
 import Input from '../../../components/UI/Input/Input'
+import withErrorHandler from '../../../hoc/withErrorHandler/withErrorHandler'
+import * as actions from '../../../store/actions/index'
+import {checkValidity} from '../../../shared/utility'
 
 class ContactData extends Component{
     state={
@@ -83,18 +87,15 @@ class ContactData extends Component{
                         {value: 'cheapest',displayValue:'Cheapest'}
                     ]
                 },
-                value:'',
+                value:'fastest',
                 validation:{},
                 valid:true
             }
         },
-        loading:false,
         isFormValid:false
     }
-
-    orderHandler= async (e)=>{
+    orderHandler= (e)=>{
         e.preventDefault()
-        this.setState({loading:true})
 
         const formData={}
 
@@ -103,28 +104,20 @@ class ContactData extends Component{
         }
 
         const orders={
-            ingredients:this.props.ingredients,
-            price:this.props.totalPrice,    
-            orderData:formData
+            ingredients:this.props.ings,
+            price:this.props.price,    
+            orderData:formData,
+            userId:this.props.userId
         }
-
-        try{
-            const response=await axios.post('/orders.json',orders)                // json required for only FIREBASE
-            this.setState({loading:false})
-            this.props.history.push('/')
-        }catch(e){
-            this.setState({loading:false})
-            console.log(e)
-        }
+        this.props.onOrderBurger(orders,this.props.token)
     }
-
     inputChangedHandler=(event,inputIdentifier)=>{
         const updatedElement={
             ...this.state.orderForm[inputIdentifier]
         }
         updatedElement.value=event.target.value
         updatedElement.touched=true
-        updatedElement.valid=this.checkValidity(updatedElement.value,updatedElement.validation)
+        updatedElement.valid=checkValidity(updatedElement.value,updatedElement.validation)
         const updatedOrderForm={
             ...this.state.orderForm
         }
@@ -139,18 +132,7 @@ class ContactData extends Component{
                         isFormValid:isFormValid
                     })
     }
-    checkValidity=(value,rules)=>{
-        let validity=true
-
-        if(rules.required){
-            validity= value.trim()!=="" && validity
-        }
-        if(rules.length){
-            validity=validity && value.length===rules.length
-        }
-
-        return validity
-    }
+    
     render(){
 
         const formElementsArray=[]
@@ -183,7 +165,7 @@ class ContactData extends Component{
                     >ORDER</Button>      {/* instead of clicked handler for button we will use onSubmit */}
             </form>
         )
-        if(this.state.loading){
+        if(this.props.loading){
             form=<Spinner/>
         }
         return(
@@ -193,8 +175,22 @@ class ContactData extends Component{
             </div>
         );
     }
-
-
 }
 
-export default ContactData;
+const mapStateToProps= state=>{
+    return{
+        ings:state.burgerBuilder.ingredients,
+        price:state.burgerBuilder.totalPrice,
+        loading:state.order.loading,
+        token:state.auth.token,
+        userId:state.auth.userId
+    }
+}
+
+const mapDispatchToProps=dispatch=>{
+    return{
+        onOrderBurger:(orderData,token)=> dispatch(actions.purchaseBurger(orderData,token))
+    }
+}
+
+export default connect(mapStateToProps,mapDispatchToProps)(withErrorHandler(ContactData,axios));
