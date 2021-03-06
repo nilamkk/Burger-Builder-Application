@@ -1,3 +1,5 @@
+This is a web based application created to explore ReactJS library. The app has a beautiful UI for both Desktop and Mobile view. 
+The app is live at: https://react-burger-builder-ca1c0.firebaseapp.com/
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
