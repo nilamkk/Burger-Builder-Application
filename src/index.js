@@ -29,9 +29,8 @@ const store=createStore(rootReducer,composeEnhancers(applyMiddleware(thunk)))
 
 const app=(
   <BrowserRouter>
-    <React.StrictMode>      {/* Sabo lagibo aitu ki hoi */}
+                      {/* Sabo lagibo aitu ki hoi */}
         <App />
-    </React.StrictMode>
   </BrowserRouter>
 )
 
